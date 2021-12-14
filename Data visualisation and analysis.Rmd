@@ -1,0 +1,688 @@
+---
+title: "Stats - Slime mold"
+author: "AMARA Y., DESPEYROUX T., SCHWARZ S."
+date: "05/12/2021"
+output: html_document
+---
+
+
+# Libraries importation
+
+```{r library, include=FALSE}
+library(ggplot2)
+library(cowplot)
+library(dplyr)
+library("gridExtra")
+library(tidyverse)
+```
+
+# Data importation
+
+```{r, echo=FALSE}
+#Put you working directory : setwd(" ")
+
+PC<-read.table("path_chosen.csv", header = TRUE, dec=",", sep=";")
+GR<-read.table("growth_rate.csv", header = TRUE, dec=",", sep=";")
+
+GR$Check.time <- as.character(GR$Check.time)
+GR$Time.of.training  <- as.character(GR$Time.of.training)
+PC$Check.time <- as.character(PC$Check.time)
+PC$Time.of.training  <- as.character(PC$Time.of.training)
+
+GR_9<- GR %>%
+  filter(Check.time==9) %>% 
+  mutate(Medium.Type = ifelse(Medium.Type == "Test", "Insecticide medium", Medium.Type)) 
+
+GR_49<- GR %>%
+  filter(Check.time==49) %>% 
+  mutate(Medium.Type = ifelse(Medium.Type == "Test", "Insecticide medium", Medium.Type)) 
+
+GR_control<- GR %>%
+  filter(Medium.Type=="Control +") %>% 
+  mutate(Medium.Type = ifelse(Medium.Type == "Test", "Insecticide medium", Medium.Type)) %>% 
+  mutate(Check.time = ifelse(Check.time == "49", "2.49", Check.time)) %>% 
+    mutate(Check.time = ifelse(Check.time == "9", "1.9", Check.time))
+  
+
+GR_insecticide<- GR %>%
+  filter(Medium.Type=="Test") %>% 
+  mutate(Medium.Type = ifelse(Medium.Type == "Test", "Insecticide medium", Medium.Type)) %>% 
+  mutate(Check.time = ifelse(Check.time == "49", "2.49", Check.time)) %>% 
+    mutate(Check.time = ifelse(Check.time == "9", "1.9", Check.time))
+
+
+PC_test_1<- PC %>% 
+  filter(Medium.Type=="Test" & Check.time==4)%>% 
+  mutate(Medium.Type = ifelse(Medium.Type == "Test", "Insecticide medium", Medium.Type)) %>% 
+  mutate(PC.Direction = ifelse(Individual == "2", "No growth", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(Individual == "3", "No growth", PC.Direction)) %>%
+  mutate(PC.Direction = ifelse(Individual == "4", "No growth", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "no choice", "No choice", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "non chemical", "Without insecticide", PC.Direction))
+
+
+PC_test_2<- PC %>% 
+  filter(Medium.Type=="Test" & Check.time==8.5)%>% 
+  mutate(Medium.Type = ifelse(Medium.Type == "Test", "Insecticide medium", Medium.Type))%>% 
+  mutate(PC.Direction = ifelse(Individual == "2", "No growth", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(Individual == "3", "No growth", PC.Direction)) %>%
+  mutate(PC.Direction = ifelse(Individual == "4", "No growth", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "no choice", "No choice", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "non chemical", "Without insecticide", PC.Direction))
+
+PC_test_3<- PC %>% 
+  filter(Medium.Type=="Test" & Check.time==23.5)%>% 
+  mutate(Medium.Type = ifelse(Medium.Type == "Test", "Insecticide medium", Medium.Type))%>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "no choice", "No choice", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "non chemical", "Without insecticide", PC.Direction))
+
+PC_test_4<- PC %>% 
+  filter(Medium.Type=="Test" & Check.time==97)%>% 
+  mutate(Medium.Type = ifelse(Medium.Type == "Test", "Insecticide medium", Medium.Type))%>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "no choice", "No choice", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "non chemical", "Without insecticide", PC.Direction))
+
+
+PC_controlpos_1<-PC %>% 
+  filter(Medium.Type=="Control +"& Check.time==4)%>% 
+  mutate(Medium.Type = ifelse(Medium.Type == "Test", "Insecticide medium", Medium.Type))%>% 
+  mutate(PC.Direction = ifelse(Individual == "5", "No growth", PC.Direction))%>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "no choice", "No choice", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "non chemical", "Without insecticide", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "right", "Right", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "left", "Left", PC.Direction))
+
+PC_controlpos_2<-PC %>% 
+  filter(Medium.Type=="Control +"& Check.time==8.5)%>% 
+  mutate(Medium.Type = ifelse(Medium.Type == "Test", "Insecticide medium", Medium.Type))%>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "no choice", "No choice", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "non chemical", "Without insecticide", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "right", "Right", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "left", "Left", PC.Direction))
+
+PC_controlpos_3<-PC %>% 
+  filter(Medium.Type=="Control +"& Check.time==23.5)%>% 
+  mutate(Medium.Type = ifelse(Medium.Type == "Test", "Insecticide medium", Medium.Type))%>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "no choice", "No choice", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "non chemical", "Without insecticide", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "right", "Right", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "left", "Left", PC.Direction))
+
+PC_controlpos_4<-PC %>% 
+  filter(Medium.Type=="Control +"& Check.time==97)%>% 
+  mutate(Medium.Type = ifelse(Medium.Type == "Test", "Insecticide medium", Medium.Type))%>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "no choice", "No choice", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "non chemical", "Without insecticide", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "right", "Right", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "left", "Left", PC.Direction))
+
+
+PC_controlneg_1<-PC %>% 
+  filter(Medium.Type=="Control -"& Check.time==4)%>% 
+  mutate(Medium.Type = ifelse(Medium.Type == "Test", "Insecticide medium", Medium.Type))%>% 
+  mutate(PC.Direction = ifelse(Individual == "1", "No growth", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(Individual == "2", "No growth", PC.Direction)) %>%
+  mutate(PC.Direction = ifelse(Individual == "3", "No growth", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(Individual == "5", "No growth", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(Individual == "6", "No growth", PC.Direction))%>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "no choice", "No choice", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "non chemical", "Without insecticide", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "right", "Right", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "left", "Left", PC.Direction))
+
+PC_controlneg_2<-PC %>% 
+  filter(Medium.Type=="Control -"& Check.time==8.5)%>% 
+  mutate(Medium.Type = ifelse(Medium.Type == "Test", "Insecticide medium", Medium.Type))%>% 
+  mutate(PC.Direction = ifelse(Individual == "6", "No growth", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "no choice", "No choice", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "non chemical", "Without insecticide", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "right", "Right", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "left", "Left", PC.Direction))
+
+PC_controlneg_3<-PC %>% 
+  filter(Medium.Type=="Control -"& Check.time==23.5)%>% 
+  mutate(Medium.Type = ifelse(Medium.Type == "Test", "Insecticide medium", Medium.Type))%>% 
+  mutate(PC.Direction = ifelse(Individual == "6", "No growth", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "no choice", "No choice", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "non chemical", "Without insecticide", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "right", "Right", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "left", "Left", PC.Direction))
+
+PC_controlneg_4<-PC %>% 
+  filter(Medium.Type=="Control -"& Check.time==97)%>% 
+  mutate(Medium.Type = ifelse(Medium.Type == "Test", "Insecticide medium", Medium.Type))%>% 
+  mutate(PC.Direction = ifelse(Individual == "1", "No growth", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(Individual == "4", "No growth", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(Individual == "5", "No growth", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(Individual == "6", "No growth", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "no choice", "No choice", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "non chemical", "Without insecticide", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "right", "Right", PC.Direction)) %>% 
+  mutate(PC.Direction = ifelse(PC.Direction == "left", "Left", PC.Direction))
+
+```
+
+#Dataframe creation for Path Chosen Barplots
+```{r, echo=FALSE}
+##TEST GROUP PATH CHOSEN
+
+bar_PC_test_1<-data.frame(c("2Insecticide","1Without insecticide","3No choice","4No growth"),c(0,2,1,3))
+colnames(bar_PC_test_1)<-c("PC.Direction","Number")
+bar_PC_test_1
+
+bar_PC_test_2<-data.frame(c("2Insecticide","1Without insecticide","3No choice","4No growth"),c(0,2,1,3))
+colnames(bar_PC_test_2)<-c("PC.Direction","Number")
+bar_PC_test_2
+
+bar_PC_test_3<-data.frame(c("2Insecticide","1Without insecticide","3No choice","4No growth"),c(0,5,1,0))
+colnames(bar_PC_test_3)<-c("PC.Direction","Number")
+bar_PC_test_3
+
+bar_PC_test_4<-data.frame(c("2Insecticide","1Without insecticide","3No choice","4No growth"),c(0,6,0,0))
+colnames(bar_PC_test_4)<-c("PC.Direction","Number")
+bar_PC_test_4
+
+
+##POSITIVE CONTROL PATH CHOSEN
+
+bar_PC_controlpos_1<-data.frame(c("1Left","2Right","3No choice","4No growth"),c(1,3,1,1))
+colnames(bar_PC_controlpos_1)<-c("PC.Direction","Number")
+bar_PC_controlpos_1
+
+bar_PC_controlpos_2<-data.frame(c("1Left","2Right","3No choice","4No growth"),c(2,3,1,0))
+colnames(bar_PC_controlpos_2)<-c("PC.Direction","Number")
+bar_PC_controlpos_2
+
+bar_PC_controlpos_3<-data.frame(c("1Left","2Right","3No choice","4No growth"),c(2,3,1,0))
+colnames(bar_PC_controlpos_3)<-c("PC.Direction","Number")
+bar_PC_controlpos_3
+
+bar_PC_controlpos_4<-data.frame(c("1Left","2Right","3No choice","4No growth"),c(1,1,4,0))
+colnames(bar_PC_controlpos_4)<-c("PC.Direction","Number")
+bar_PC_controlpos_4
+
+
+
+##NEGATIVE CONTROL PATH CHOSEN
+
+bar_PC_controlneg_1<-data.frame(c("1Left","2Right","3No choice","4No growth"),c(0,0,1,5))
+colnames(bar_PC_controlneg_1)<-c("PC.Direction","Number")
+bar_PC_controlneg_1
+
+bar_PC_controlneg_2<-data.frame(c("1Left","2Right","3No choice","4No growth"),c(2,0,3,1))
+colnames(bar_PC_controlneg_2)<-c("PC.Direction","Number")
+bar_PC_controlneg_2
+
+bar_PC_controlneg_3<-data.frame(c("1Left","2Right","3No choice","4No growth"),c(2,2,1,1))
+colnames(bar_PC_controlneg_3)<-c("PC.Direction","Number")
+bar_PC_controlneg_3
+
+bar_PC_controlneg_4<-data.frame(c("1Left","2Right","3No choice","4No growth"),c(1,0,1,4))
+colnames(bar_PC_controlneg_4)<-c("PC.Direction","Number")
+bar_PC_controlneg_4
+
+
+```
+
+#Data Representation
+
+##Growth rate representation
+
+```{r, echo=FALSE}
+growth.medium9<-ggplot(GR_9, aes(x=Medium.Type, y=Growth, fill = Medium.Type)) +
+  geom_boxplot()+theme_minimal() +
+  xlab("Medium Type")+
+  ylab("Growth rate (cm/h)")+
+  theme(legend.position = "none")+
+  scale_x_discrete(label=c("Control +","Chemical medium"))+
+  scale_fill_brewer(palette="Greens")+
+  scale_y_continuous(limits=c(0,0.3))
+
+
+growth.medium49<-ggplot(GR_49, aes(x=Medium.Type, y=Growth, fill = Medium.Type)) +
+  geom_boxplot()+theme_minimal()+
+  xlab("Medium Type")+
+  ylab(" ")+
+  theme(legend.position = "none")+
+  scale_x_discrete(label=c("Control +","Chemical medium"))+
+  scale_fill_brewer(palette="Greens")+
+  scale_y_continuous(limits=c(0,0.3))
+
+
+plot_grid(growth.medium9,growth.medium49, labels=c("A","B"), ncol = 2, nrow = 1)
+
+
+growth.check.control<-ggplot(GR_control, aes(x=Check.time, y=Growth, fill = Check.time)) +
+  geom_boxplot()+theme_minimal()+
+  xlab("Time passed since sampling")+
+  ylab("Growth rate (cm/h)")+
+  theme(legend.position = "none")+
+
+  scale_fill_brewer(palette="Greens")+
+  scale_y_continuous(limits=c(0,0.3))+
+  scale_x_discrete(label=c("9h","49h"))
+
+growth.check.insecticide<-ggplot(GR_insecticide, aes(x=Check.time, y=Growth, fill = Check.time)) +
+  geom_boxplot()+theme_minimal()+
+  xlab("Time passed since sampling")+
+  ylab(" ")+
+  theme(legend.position = "none")+
+  scale_fill_brewer(palette="Greens")+
+  scale_x_discrete(label=c("9h","49h"))+
+
+  scale_y_continuous(limits=c(0,0.3))
+
+
+plot_grid(growth.check.control,growth.check.insecticide, labels=c("A","B"), ncol = 2, nrow = 1)
+
+m_insecticide_9<- GR_9 %>% 
+  filter(Medium.Type=="Insecticide medium")
+m_control_9<- GR_9 %>% 
+  filter(Medium.Type=="Control +")
+
+m_insecticide_49<- GR_49 %>% 
+  filter(Medium.Type=="Insecticide medium")
+
+m_control_49<- GR_49 %>% 
+  filter(Medium.Type=="Control +")
+
+mean(m_insecticide_9$Growth)
+mean(m_insecticide_49$Growth)
+mean(m_control_9$Growth)
+mean(m_control_49$Growth)
+```
+
+
+##Path chosen representation
+```{r, echo=TRUE}
+pc_test_check1<-ggplot(data=bar_PC_test_1,aes(x=PC.Direction,y=Number,fill=PC.Direction))+
+                  geom_bar(stat="identity",position=position_dodge(),color="black")+
+  xlab(" ")+
+  ylab("Number of individuals")+
+  theme_minimal()+
+  theme(legend.position = "none")+
+  scale_x_discrete(labels = c('Non-chemical','Chemical', 'No choice', 'No growth'))+
+  scale_y_continuous(limits=c(0,6))+
+  scale_fill_brewer(palette="Greens")
+
+
+
+
+pc_test_check2<-ggplot(data=bar_PC_test_2,aes(x=PC.Direction,y=Number,fill=PC.Direction))+
+                  geom_bar(stat="identity",position=position_dodge(),color="black")+
+  xlab(" ")+
+  ylab(" ")+
+  theme_minimal()+
+  theme(legend.position = "none")+
+  scale_x_discrete(labels = c('Non-chemical','Chemical', 'No choice', 'No growth'))+
+  scale_fill_brewer(palette="Greens")+
+  scale_y_continuous(limits=c(0,6))
+
+
+
+pc_test_check3<-ggplot(data=bar_PC_test_3,aes(x=PC.Direction,y=Number,fill=PC.Direction))+
+                  geom_bar(stat="identity",position=position_dodge(),color="black")+
+  xlab(" ")+
+  ylab("Number of individuals")+
+  theme_minimal()+
+  theme(legend.position = "none")+
+  scale_x_discrete(labels = c('Non-chemical','Chemical', 'No choice', 'No growth'))+
+  scale_fill_brewer(palette="Greens")+
+  scale_y_continuous(limits=c(0,6))
+
+
+
+
+pc_test_check4<-ggplot(data=bar_PC_test_4,aes(x=PC.Direction,y=Number,fill=PC.Direction))+
+                  geom_bar(stat="identity",position=position_dodge(),color="black")+
+  xlab(" ")+
+  ylab(" ")+
+  theme_minimal()+
+  theme(legend.position = "none")+
+  scale_x_discrete(labels = c('Non-chemical','Chemical', 'No choice', 'No growth'))+
+  scale_fill_brewer(palette="Greens")+
+  scale_y_continuous(limits=c(0,6))
+
+
+
+
+
+##POSITIVE CONTROL 
+pc_controlpos_check1<-ggplot(data=bar_PC_controlpos_1,aes(x=PC.Direction,y=Number,fill=PC.Direction))+
+                  geom_bar(stat="identity",position=position_dodge(),color="black")+
+  xlab(" ")+
+  ylab("Number of individuals")+
+  theme_minimal()+
+  theme(legend.position = "none")+
+  scale_x_discrete(labels = c("Left","Right","No choice","No growth"))+
+  scale_fill_brewer(palette="Greens")+
+  scale_y_continuous(limits=c(0,6))
+
+
+
+pc_controlpos_check2<-ggplot(data=bar_PC_controlpos_2,aes(x=PC.Direction,y=Number,fill=PC.Direction))+
+                  geom_bar(stat="identity",position=position_dodge(),color="black")+
+  xlab(" ")+
+  ylab(" ")+
+  theme_minimal()+
+  theme(legend.position = "none")+
+  scale_x_discrete(labels = c("Left","Right","No choice","No growth"))+
+  scale_fill_brewer(palette="Greens")+
+  scale_y_continuous(limits=c(0,6))
+
+
+
+
+pc_controlpos_check3<-ggplot(data=bar_PC_controlpos_3,aes(x=PC.Direction,y=Number,fill=PC.Direction))+
+                  geom_bar(stat="identity",position=position_dodge(),color="black")+
+  xlab(" ")+
+  ylab("Number of individuals")+
+  theme_minimal()+
+  theme(legend.position = "none")+
+  scale_x_discrete(labels = c("Left","Right","No choice","No growth"))+
+  scale_fill_brewer(palette="Greens")+
+  scale_y_continuous(limits=c(0,6))
+
+
+
+
+
+pc_controlpos_check4<-ggplot(data=bar_PC_controlpos_4,aes(x=PC.Direction,y=Number,fill=PC.Direction))+
+                  geom_bar(stat="identity",position=position_dodge(),color="black")+
+  xlab(" ")+
+  ylab(" ")+
+  theme_minimal()+
+  theme(legend.position = "none")+
+  scale_x_discrete(labels = c("Left","Right","No choice","No growth"))+
+  scale_fill_brewer(palette="Greens")+
+  scale_y_continuous(limits=c(0,6))
+
+
+
+
+
+##NEGATIVE CONTROL
+
+pc_controlneg_check1<-ggplot(data=bar_PC_controlneg_1,aes(x=PC.Direction,y=Number,fill=PC.Direction))+
+                  geom_bar(stat="identity",position=position_dodge(),color="black")+
+  xlab(" ")+
+  ylab("Number of individuals")+
+  theme_minimal()+
+  theme(legend.position = "none")+
+  scale_x_discrete(labels = c("Left","Right","No choice","No growth"))+
+  scale_fill_brewer(palette="Greens")+
+  scale_y_continuous(limits=c(0,6))
+
+
+
+pc_controlneg_check2<-ggplot(data=bar_PC_controlneg_2,aes(x=PC.Direction,y=Number,fill=PC.Direction))+
+                  geom_bar(stat="identity",position=position_dodge(),color="black")+
+  xlab(" ")+
+  ylab(" ")+
+  theme_minimal()+
+  theme(legend.position = "none")+
+  scale_x_discrete(labels = c("Left","Right","No choice","No growth"))+
+  scale_fill_brewer(palette="Greens")+
+  scale_y_continuous(limits=c(0,6))
+
+
+
+pc_controlneg_check3<-ggplot(data=bar_PC_controlneg_3,aes(x=PC.Direction,y=Number,fill=PC.Direction))+
+                  geom_bar(stat="identity",position=position_dodge(),color="black")+
+  xlab(" ")+
+  ylab("Number of individuals")+
+  theme_minimal()+
+  theme(legend.position = "none")+
+  scale_x_discrete(labels = c("Left","Right","No choice","No growth"))+
+  scale_fill_brewer(palette="Greens")+
+  scale_y_continuous(limits=c(0,6))
+
+pc_controlneg_check3
+
+
+pc_controlneg_check4<-ggplot(data=bar_PC_controlneg_4,aes(x=PC.Direction,y=Number,fill=PC.Direction))+
+                  geom_bar(stat="identity",position=position_dodge(),color="black")+
+  xlab(" ")+
+  ylab(" ")+
+  theme_minimal()+
+  theme(legend.position = "none")+
+  scale_x_discrete(labels = c("Left","Right","No choice","No growth"))+
+  scale_fill_brewer(palette="Greens")+
+  scale_y_continuous(limits=c(0,6))
+
+
+plot_grid(pc_test_check1,pc_test_check2,pc_test_check3,pc_test_check4,labels=c("A","B","C","D"), ncol = 2, nrow = 2)#TEST
+
+plot_grid(pc_controlpos_check1,pc_controlpos_check2,pc_controlpos_check3,pc_controlpos_check4,labels=c("A","B","C","D"), ncol = 2, nrow = 2)#controlpos
+
+plot_grid(pc_controlneg_check1,pc_controlneg_check2,pc_controlneg_check3,pc_controlneg_check4,labels=c("A","B","C","D"), ncol = 2, nrow = 2)#controlneg
+
+
+```
+
+
+#Tables creation for the tests of Path Chosen
+```{r, echo=FALSE}
+##TEST GROUP PATH CHOSEN
+
+khi_PC_test_1 <- cbind(c(0,2,1,3))
+dimnames(khi_PC_test_1)<-list((c("Without insecticide","Insecticide","No choice","No growth")))
+
+khi_PC_test_1
+
+khi_PC_test_2 <- cbind(c(0,2,1,3))
+dimnames(khi_PC_test_2)<-list((c("Without insecticide","Insecticide","No choice","No growth")))
+
+khi_PC_test_2
+
+khi_PC_test_3 <- cbind(c(0,5,1,0))
+dimnames(khi_PC_test_3)<-list((c("Without insecticide","Insecticide","No choice","No growth")))
+
+khi_PC_test_3
+
+khi_PC_test_4 <- cbind(c(0,6,0,0))
+dimnames(khi_PC_test_4)<-list((c("Without insecticide","Insecticide","No choice","No growth")))
+
+khi_PC_test_4
+
+khi_PC_test<- head(cbind(khi_PC_test_1,khi_PC_test_2,khi_PC_test_3,khi_PC_test_4))
+
+
+##POSITIVE CONTROL PATH CHOSEN
+
+khi_PC_controlpos_1 <- cbind(c(1,3,1,1))
+dimnames(khi_PC_controlpos_1)<-list((c("Left","Right","No choice","No growth")))
+
+
+khi_PC_controlpos_1
+
+khi_PC_controlpos_2 <- cbind(c(2,3,1,0))
+dimnames(khi_PC_controlpos_2)<-list((c("Left","Right","No choice","No growth")))
+
+khi_PC_controlpos_2
+
+khi_PC_controlpos_3 <- cbind(c(2,3,1,0))
+dimnames(khi_PC_controlpos_3)<-list((c("Left","Right","No choice","No growth")))
+
+khi_PC_controlpos_3
+
+khi_PC_controlpos_4 <- cbind(c(1,1,4,0))
+dimnames(khi_PC_controlpos_4)<-list((c("Left","Right","No choice","No growth")))
+
+khi_PC_controlpos_4
+
+khi_PC_controlpos<- head(cbind(khi_PC_controlpos_1,khi_PC_controlpos_2,khi_PC_controlpos_3,khi_PC_controlpos_4))
+
+
+##NEGATIVE CONTROL PATH CHOSEN
+
+khi_PC_controlneg_1 <- cbind(c(0,0,1,5))
+dimnames(khi_PC_controlneg_1)<-list((c("Left","Right","No choice","No growth")))
+
+khi_PC_controlneg_1
+
+khi_PC_controlneg_2 <- cbind(c(2,0,3,1))
+dimnames(khi_PC_controlneg_2)<-list((c("Left","Right","No choice","No growth")))
+
+khi_PC_controlneg_2
+
+khi_PC_controlneg_3 <- cbind(c(2,2,1,1))
+dimnames(khi_PC_controlneg_3)<-list((c("Left","Right","No choice","No growth")))
+
+khi_PC_controlneg_3
+
+khi_PC_controlneg_4 <- cbind(c(1,0,1,4))
+dimnames(khi_PC_controlneg_4)<-list((c("Left","Right","No choice","No growth")))
+
+khi_PC_controlneg_4
+
+khi_PC_controlneg<- head(cbind(khi_PC_controlneg_1,khi_PC_controlneg_2,khi_PC_controlneg_3,khi_PC_controlneg_4))
+
+
+```
+
+#Statistical test
+
+##Growth rate
+##Is the growth rate negatively impacted by the presence of the insecticde ?
+
+##Between test and control ?
+#9h
+```{r, echo=TRUE}
+x <- GR[GR[,"Check.time"]==9 & GR[,"Medium.Type"]=="Test", "Growth"]
+y <- GR[GR[,"Check.time"]==9 & GR[,"Medium.Type"]=="Control +", "Growth"]
+
+var.test(x,y) #Variances inégales
+
+shapiro.test(x)#Pas de normalité
+shapiro.test(y)#p value = 0.0551
+
+
+wilcox.test(x,y) #p value = 0.04225
+
+```
+
+#49h
+```{r, echo=TRUE}
+x <- GR[GR[,"Check.time"]==49 & GR[,"Medium.Type"]=="Test", "Growth"]
+y <- GR[GR[,"Check.time"]==49 & GR[,"Medium.Type"]=="Control +", "Growth"]
+
+var.test(x,y) #p value = 0.0006
+
+shapiro.test(x)#p value = 0.004
+shapiro.test(y)#p value = 0.1583
+
+wilcox.test(x,y) #p value = 0.01768 w=3
+
+```
+
+##Between 9h and 49h ?
+#Test group
+```{r, echo=TRUE}
+x <- GR[GR[,"Check.time"]==9 & GR[,"Medium.Type"]=="Test", "Growth"]
+y <- GR[GR[,"Check.time"]==49 & GR[,"Medium.Type"]=="Test", "Growth"]
+
+var.test(x,y) #p value = 0.02185
+
+shapiro.test(x)#p value = 0.0006206
+shapiro.test(y)#p value = 0.004039
+
+wilcox.test(x,y) #p value = 0.6525 W=15
+
+```
+
+#Control group
+```{r, echo=TRUE}
+x <- GR[GR[,"Check.time"]==9 & GR[,"Medium.Type"]=="Control +", "Growth"]
+y <- GR[GR[,"Check.time"]==49 & GR[,"Medium.Type"]=="Control +", "Growth"]
+
+var.test(x,y) #p value = 0.1438
+
+shapiro.test(x)#p value = 0.0551
+shapiro.test(y)#p value = 0.1583
+
+t.test(x,y, alternative = "two.sided", conf.level=0.95, paired = TRUE) #p value = 0.5411
+d=0.0025/4
+
+library(pwr)
+pwr.t.test(d=d,n=6,sig.level=0.05,type="paired",alternative="two.sided")
+
+```
+
+##Path chosen
+##Is the Physarum polycephalum capable to detect the presence of the insecticide and can it avoid it ?
+
+
+#Test_check_1 (4h)
+```{r, echo=FALSE}
+chisq.test(khi_PC_test[,1])
+
+```
+
+#Test_check_2 (9h)
+```{r, echo=FALSE}
+chisq.test(khi_PC_test[,2])
+
+```
+
+#Test_check_3 (24h)
+```{r, echo=FALSE}
+chisq.test(khi_PC_test[,3])
+
+```
+
+#Test_check_4 (97h)
+```{r, echo=FALSE}
+chisq.test(khi_PC_test[,4])
+
+
+```
+
+#Control+_check_1 (4h)
+```{r, echo=FALSE}
+chisq.test(khi_PC_controlpos[,1])
+
+```
+
+#Control+_check_2 (9h)
+```{r, echo=FALSE}
+chisq.test(khi_PC_controlpos[,2])
+
+```
+
+#Control+_check_3 (24h)
+```{r, echo=FALSE}
+chisq.test(khi_PC_controlpos[,3])
+
+```
+
+#Control+_check_4 (97h)
+```{r, echo=FALSE}
+chisq.test(khi_PC_controlpos[,4])
+
+```
+
+
+#Control-_check_1 (4h)
+```{r, echo=FALSE}
+chisq.test(khi_PC_controlneg[,1])
+
+```
+
+#Control-_check_2 (9h)
+```{r, echo=FALSE}
+chisq.test(khi_PC_controlneg[,2])
+
+```
+
+#Control-_check_3 (24h)
+```{r, echo=FALSE}
+chisq.test(khi_PC_controlneg[,3])
+
+```
+
+#Control-_check_4 (97h)
+```{r, echo=FALSE}
+chisq.test(khi_PC_controlneg[,4])
+
+```
