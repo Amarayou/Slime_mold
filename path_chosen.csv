@@ -1,0 +1,73 @@
+Time of training;Check time;Individual;Medium Type;PC Direction;PC Distance
+0;4;1;Test;non chemical;0.1
+0;4;1;Control +;no choice;0.5
+0;4;1;Control -;NA;0
+0;4;2;Test;NA;0
+0;4;2;Control +;left;2.5
+0;4;2;Control -;NA;0
+0;4;3;Test;NA;0
+0;4;3;Control +;right;0.6
+0;4;3;Control -;NA;0
+0;4;4;Test;NA;0
+0;4;4;Control +;right;0.4
+0;4;4;Control -;no choice;0
+0;4;5;Test;non chemical;1.5
+0;4;5;Control +;NA;0
+0;4;5;Control -;NA;0
+0;4;6;Test;no choice;0
+0;4;6;Control +;right;1
+0;4;6;Control -;NA;0
+0;8,5;1;Test;non chemical;1.5
+0;8,5;1;Control +;left;3
+0;8,5;1;Control -;no choice;0
+0;8,5;2;Test;NA;0
+0;8,5;2;Control +;left;3
+0;8,5;2;Control -;no choice;0
+0;8,5;3;Test;NA;0
+0;8,5;3;Control +;right;2.5
+0;8,5;3;Control -;left;0.1
+0;8,5;4;Test;NA;0
+0;8,5;4;Control +;right;2
+0;8,5;4;Control -;no choice;0
+0;8,5;5;Test;non chemical;2
+0;8,5;5;Control +;no choice;0.1
+0;8,5;5;Control -;left;0.1
+0;8,5;6;Test;no choice;0
+0;8,5;6;Control +;right;1
+0;8,5;6;Control -;NA;0
+0;23,5;1;Test;non chemical;3
+0;23,5;1;Control +;left;3.5
+0;23,5;1;Control -;no choice;0
+0;23,5;2;Test;non chemical;0.1
+0;23,5;2;Control +;left;4
+0;23,5;2;Control -;right;0.5
+0;23,5;3;Test;non chemical;0.5
+0;23,5;3;Control +;right;4
+0;23,5;3;Control -;left;0.1
+0;23,5;4;Test;non chemical;1
+0;23,5;4;Control +;right;3.5
+0;23,5;4;Control -;right;0.1
+0;23,5;5;Test;no choice;2
+0;23,5;5;Control +;no choice;1.5
+0;23,5;5;Control -;left;0.1
+0;23,5;6;Test;non chemical;1
+0;23,5;6;Control +;right;1
+0;23,5;6;Control -;NA;0
+0;97;1;Test;non chemical;4
+0;97;1;Control +;no choice;4
+0;97;1;Control -;NA;0
+0;97;2;Test;non chemical;3
+0;97;2;Control +;no choice;4
+0;97;2;Control -;left;0.5
+0;97;3;Test;non chemical;3
+0;97;3;Control +;no choice;4
+0;97;3;Control -;no choice;0,5
+0;97;4;Test;non chemical;4
+0;97;4;Control +;left;4
+0;97;4;Control -;NA;0
+0;97;5;Test;non chemical;3
+0;97;5;Control +;no choice;2
+0;97;5;Control -;NA;0
+0;97;6;Test;non chemical;3,5
+0;97;6;Control +;right;4
+0;97;6;Control -;NA;0
